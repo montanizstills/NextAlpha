@@ -1,6 +1,7 @@
+import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import ReactGlobe from 'react-globe';
+import HealthStatus from './HealthStatus';
 
 function App() {
     return (
@@ -20,7 +21,7 @@ function App() {
             </header>
             <div>
                 Hello, World!
-                <ReactGlobe />
+                <HealthStatus />
             </div>
         </div>
     );
