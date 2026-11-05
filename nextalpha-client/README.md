@@ -2,6 +2,32 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+## Configuration
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `REACT_APP_API_BASE_URL` | empty (same-origin) | Base URL of the NextAlpha API (`nextalpha-application`), e.g. `http://localhost:5000`. Trailing slashes are trimmed. Read by `src/api/client.js`; the app pings `GET /health` on load. |
+
+Like all `REACT_APP_*` variables, it is inlined at **build time**, so set it before `npm start` / `npm run build` (e.g. in `.env.local` or the shell). Do not put secrets in it: it ends up in the public bundle. If you point it at a different origin, the API must allow that origin via CORS.
+
+### Local development (same-origin via the dev proxy)
+
+By default `REACT_APP_API_BASE_URL` is left **unset**, so the client calls the API on the same origin. In development, `npm start` forwards those calls to the backend through the CRA `"proxy"` field in `package.json`:
+
+```json
+"proxy": "http://localhost:5081"
+```
+
+`http://localhost:5081` is the `http` launch profile from `nextalpha-application/Properties/launchSettings.json`. Start the API with that profile (for example `dotnet run --launch-profile http`), then run `npm start`. A request such as `GET /health` from the page is forwarded to `http://localhost:5081/health`. If the backend's dev port changes, update `proxy` too.
+
+The CRA proxy only forwards requests whose `Accept` header is not `text/html`. `src/api/client.js` sends `Accept: application/json`, so its requests are forwarded. The proxy exists only in `npm start`. A production build has to be served from the same origin as the API, or built with `REACT_APP_API_BASE_URL` set.
+
+## Toolchain notes
+
+- This app uses `react-scripts` 2.x (webpack 4, Jest 23). Webpack 4 needs Node's legacy OpenSSL provider on Node 17+, so `start` and `build` pass `--openssl-legacy-provider` to Node. Verified on Node 22.
+- `react-scripts` 2.x uses the classic JSX transform: every file that contains JSX must `import React from 'react'`.
+- Jest 23's jsdom has no `MutationObserver`, so Testing Library's `findBy*` / `waitFor` do not work; flush async effects with `await act(async () => { render(...) })` instead (see `src/App.test.js`).
+
 ## Available Scripts
 
 In the project directory, you can run:
