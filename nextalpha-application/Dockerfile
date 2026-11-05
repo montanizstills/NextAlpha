@@ -1,12 +1,14 @@
 # Build context is this directory (nextalpha-application/). From the repo root:
 #   docker build -t nextalpha-api nextalpha-application
 #   docker run --rm -p 8080:80 nextalpha-api     # then: curl http://localhost:8080/health
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
+# .NET 8+ images default to port 8080; ASPNETCORE_HTTP_PORTS keeps the existing port-80 contract.
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
+ENV ASPNETCORE_HTTP_PORTS=80
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY ["NETWebAppMVC.csproj", "./"]
 RUN dotnet restore "NETWebAppMVC.csproj"
