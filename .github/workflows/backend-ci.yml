@@ -2,9 +2,9 @@ name: backend-ci
 
 on:
   push:
-    branches: ["agent/**", "project-migration"]
+    branches: ["feat/**", "agent/**", "dev", "project-migration"]
   pull_request:
-    branches: ["agent/**", "project-migration"]
+    branches: ["feat/**", "agent/**", "dev", "project-migration"]
 
 permissions:
   contents: read
