@@ -1,25 +1,41 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using NETWebAppMVC.Models;
-using NETWebAppMVC.Services;
+using NETWebAppMVC.Services.Interfaces;
 
 namespace NETWebAppMVC.Controllers;
 
-[Controller]
+[ApiController]
 [Route("api/[controller]")]
-public class ProductsController
+public class ProductsController : ControllerBase
 {
-    private readonly BusinessLogic _myService = new BusinessLogic();
+    private readonly IBusinessLogic _businessLogic;
+
+    public ProductsController(IBusinessLogic businessLogic)
+    {
+        _businessLogic = businessLogic;
+    }
 
     [HttpGet("all")]
     public string GetProducts()
     {
-        return _myService.Print();
+        return _businessLogic.Print();
     }
 
-    [HttpPost("{id:int?}")]
+    [HttpGet("{id:int?}")]
     public string GetProductById(int id)
     {
-        return id == 0 ? _myService.Print() : "Goodbye World!";
+        return _businessLogic.DescribeProduct(id);
+    }
+
+    /// <summary>
+    /// Legacy POST form of <see cref="GetProductById"/>, kept so existing callers keep working.
+    /// New callers should use GET.
+    /// </summary>
+    [HttpPost("{id:int?}")]
+    [Obsolete("Use GET api/products/{id} instead.")]
+    public string GetProductByIdLegacyPost(int id)
+    {
+        return _businessLogic.DescribeProduct(id);
     }
 
     [HttpPost("new")]
